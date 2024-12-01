@@ -1,21 +1,21 @@
-import { ref } from "vue";
-import axios from "axios";
-import { type Message, type FileInfo } from "@/type";
-import OpenAI from "openai";
+import { ref } from 'vue';
+import axios from 'axios';
+import { type Message, type FileInfo } from '@/type';
+import OpenAI from 'openai';
 
-const newApi = 'fastgpt-hfnErSFSB8lR6ApYRx8jBbIW7I7HU94PWUjq71jZDLGG8XdcUVKCQw'
+const newApi = 'fastgpt-qDxClbMzQYZCR0QcwusKFmGNHvKfGtI5pDjK4uHEkSMsFTr89f4kc';
 
-// 
+//
 // sk-q1Ms3FRgsg1SwxaH8Z7t0DZ0mc9kIncoGqqmCcmab4w2hjS9
 const client = new OpenAI({
-  apiKey: "w6k20TO8YooIEKMH2lHDcn8nFBa4z2Rabb09UXTb1jmdq37fe14j",
-  baseURL: "https://api.moonshot.cn/v1",
+  apiKey: 'w6k20TO8YooIEKMH2lHDcn8nFBa4z2Rabb09UXTb1jmdq37fe14j',
+  baseURL: 'https://api.moonshot.cn/v1',
   dangerouslyAllowBrowser: true,
 });
 
 interface FileUploadResponse {
   id: string; //String;
-  object: "file";
+  object: 'file';
   bytes: number; //291730;
   created_at: number; // 1730385813;
   filename: string; //"result_xvvmXK (1).jpg";
@@ -27,18 +27,18 @@ interface FileUploadResponse {
 // API 本身不具有记忆功能 这里手动实现
 const messageHistoryList = ref<Message[]>([
   {
-    role: "assistant",
+    role: 'assistant',
     content:
-      "Hi,我是空天AI~。<br> 很高兴遇见你！你可以问我一切有关无人机领域的问题，我来帮你解答。",
+      'Hi,我是空天AI~。<br> 很高兴遇见你！你可以问我一切有关无人机领域的问题，我来帮你解答。',
   },
 ]);
 
-const filesAnsly = ref("");
+const filesAnsly = ref('');
 const fileList = ref<FileInfo[]>([]);
-const fileContentMessage = ref<{ role: "system"; content: any }[]>([]);
+const fileContentMessage = ref<{ role: 'system'; content: any }[]>([]);
 const generateLoading = ref(false);
 const selectArticle = ref(0);
-const digaoText = ref("");
+const digaoText = ref('');
 
 //3  fastgpt-qDxClbMzQYZCR0QcwusKFmGNHvKfGtI5pDjK4uHEkSMsFTr89f4kc'
 // fastgpt-sk-q1Ms3FRgsg1SwxaH8Z7t0DZ0mc9kIncoGqqmCcmab4w2hjS9
@@ -47,15 +47,14 @@ export const useKimi = () => {
 
   async function chat(input: string) {
     messageHistoryList.value.push({
-      role: "user",
+      role: 'user',
       content: input,
     });
-    fetch("https://api.fastgpt.in/api/v1/chat/completions", {
-      method: "POST",
+    fetch('https://api.fastgpt.in/api/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          `Bearer ${newApi}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${newApi}`,
       },
       body: JSON.stringify({
         chatId: new Date().getTime().toString(),
@@ -64,12 +63,12 @@ export const useKimi = () => {
         messages: [
           {
             content: `${input}（答案结尾显示信息来源）`,
-            role: "user",
+            role: 'user',
           },
         ],
       }),
     }).then(async (response: any) => {
-      console.log("response",response)
+      console.log('response', response);
 
       // const res = {
       //   role: "assistant",
@@ -77,8 +76,8 @@ export const useKimi = () => {
       // } as any
 
       messageHistoryList.value.push({
-                role: "assistant",
-        content: ""
+        role: 'assistant',
+        content: '',
       });
 
       const res = messageHistoryList.value[messageHistoryList.value.length - 1];
@@ -88,13 +87,13 @@ export const useKimi = () => {
       while (true) {
         var { value, done } = await reader.read();
 
-        console.log('分会结果',value)
+        console.log('分会结果', value);
         if (done) break;
         const objects = value
-          .split("\n")
-          .filter((line: any) => line.startsWith("data: {")) // 只处理以 'data:' 开头的行
+          .split('\n')
+          .filter((line: any) => line.startsWith('data: {')) // 只处理以 'data:' 开头的行
           .map((line: any) => {
-            const jsonString = line.replace("data: ", ""); // 去掉 'data: ' 前缀
+            const jsonString = line.replace('data: ', ''); // 去掉 'data: ' 前缀
             return JSON.parse(jsonString); // 解析为对象
           });
         objects.forEach((item: any) => {
@@ -113,9 +112,9 @@ export const useKimi = () => {
         name: files[i].name,
         type: files[i].type,
         size: files[i].size,
-        id: "",
+        id: '',
         fn: function () {
-          console.log("this", this);
+          console.log('this', this);
           const randomNum = Math.floor(Math.random() * 10) + 1;
           setTimeout(() => {
             this.id = new Date().getTime().toString();
@@ -124,7 +123,7 @@ export const useKimi = () => {
       });
       fileList.value[fileList.value.length - 1].fn();
       const formData = new FormData();
-      formData.append("file", files[i]);
+      formData.append('file', files[i]);
 
       // fetch("/api/v1/files", {
       //   method: "POST",
@@ -219,24 +218,23 @@ export const useKimi = () => {
     //     });
     //   }
     // }
-    filesAnsly.value = "";
+    filesAnsly.value = '';
     selectArticle.value = 0;
     generateLoading.value = true;
-    fetch("https://api.fastgpt.in/api/v1/chat/completions", {
-      method: "POST",
+    fetch('https://api.fastgpt.in/api/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          `Bearer ${newApi}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${newApi}`,
       },
       body: JSON.stringify({
-        chatId: "412412",
+        chatId: '412412',
         stream: true,
         detail: false,
         messages: [
           {
             content: `请基于所提供的文献,${digaoText.value}。请提取并整合文献中的专业信息，用丰富的论据支持报告中的论点和数据，每个副标题下内容不少于 100 字。在报告末尾附上所有引用的参考文献列表。`,
-            role: "user",
+            role: 'user',
           },
         ],
       }),
@@ -249,10 +247,10 @@ export const useKimi = () => {
         var { value, done } = await reader.read();
         if (done) break;
         const objects = value
-          .split("\n")
-          .filter((line: any) => line.startsWith("data: {")) // 只处理以 'data:' 开头的行
+          .split('\n')
+          .filter((line: any) => line.startsWith('data: {')) // 只处理以 'data:' 开头的行
           .map((line: any) => {
-            const jsonString = line.replace("data: ", ""); // 去掉 'data: ' 前缀
+            const jsonString = line.replace('data: ', ''); // 去掉 'data: ' 前缀
             return JSON.parse(jsonString); // 解析为对象
           });
         objects.forEach((item: any) => {
@@ -266,12 +264,11 @@ export const useKimi = () => {
 
   async function fileChat(file: any) {
     const formData = new FormData();
-    formData.append("file", file);
-    fetch("/api/v1/files", {
-      method: "POST",
+    formData.append('file', file);
+    fetch('/api/v1/files', {
+      method: 'POST',
       headers: {
-        Authorization:
-          `Bearer ${newApi}`,
+        Authorization: `Bearer ${newApi}`,
       },
       body: formData,
     }).then(async (res: any) => {
@@ -280,20 +277,19 @@ export const useKimi = () => {
       while (true) {
         var { value, done } = await reader.read();
         if (done) break;
-        console.log("aaaa", JSON.parse(value));
+        console.log('aaaa', JSON.parse(value));
         resRes = JSON.parse(value);
       }
       const fileUploadRes: FileUploadResponse = res as any;
 
-      console.log("file", res);
+      console.log('file', res);
 
       // let file_content = await (await client.files.content(resRes.id)).text();
       // console.log("000", file_content);
       fetch(`/api/v1/files/${resRes.id}/content`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          Authorization:
-            `Bearer ${newApi}`,
+          Authorization: `Bearer ${newApi}`,
         },
       }).then(async (res: any) => {
         const reader = res.body
@@ -302,26 +298,25 @@ export const useKimi = () => {
         while (true) {
           var { value, done } = await reader.read();
           if (done) break;
-          console.log("bbbb", JSON.parse(value));
-          fetch("/api/v1/chat/completions", {
-            method: "POST",
+          console.log('bbbb', JSON.parse(value));
+          fetch('/api/v1/chat/completions', {
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                `Bearer ${newApi}`,
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${newApi}`,
             },
             body: JSON.stringify({
               messages: [
                 {
-                  role: "system",
+                  role: 'system',
                   content: JSON.parse(value).content,
                 },
                 {
-                  role: "user",
-                  content: "帮我分析一下，多大的概率可以找到工作？",
+                  role: 'user',
+                  content: '帮我分析一下，多大的概率可以找到工作？',
                 },
               ],
-              model: "moonshot-v1-8k",
+              model: 'moonshot-v1-8k',
               temperature: 0.3,
             }),
           }).then(async (res: any) => {
@@ -331,10 +326,10 @@ export const useKimi = () => {
             while (true) {
               var { value, done } = await reader.read();
               if (done) break;
-              console.log("最后的结果", JSON.parse(value));
+              console.log('最后的结果', JSON.parse(value));
               console.log(
-                "最后的结果lalala",
-                JSON.parse(value).choices[0].message.content
+                '最后的结果lalala',
+                JSON.parse(value).choices[0].message.content,
               );
               filesAnsly.value = JSON.parse(value).choices[0].message.content;
             }
