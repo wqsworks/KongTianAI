@@ -1,0 +1,14 @@
+*{
+  padding: 0 ;
+  margin: 0;
+  box-sizing: border-box;
+}
+.el-textarea__inner {
+  box-shadow: 0 !important;
+}
+.el-textarea__inner:hover {
+  box-shadow: 0 !important;
+}
+.el-textarea__inner:focus {
+  box-shadow: 0 !important;
+}
